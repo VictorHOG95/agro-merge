@@ -1,4 +1,4 @@
-@charset "utf-8";
+﻿@charset "utf-8";
 
 /* ================= RESET Y GLOBALES ================= */
 * {
@@ -317,30 +317,30 @@ header {
   font-size: 22px; 
 }
 
-/* Botón Carrito */
-.btn-carrito {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 50px;
-  cursor: pointer;
-  
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  margin-top: 10px;
+/* Botón Agregar al Carrito - Sobreescribir carrito.css */
+.producto-info .btn-carrito {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: white !important;
+  border: none !important;
+  width: 100% !important;
+  padding: 12px !important;
+  border-radius: 50px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  margin-top: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  height: auto !important;
+  min-width: auto !important;
 }
 
-.btn-carrito:hover {
-    opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+.producto-info .btn-carrito:hover {
+    opacity: 0.9 !important;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important;
 }
 
 /* ================= BANNER FINAL ================= */
@@ -418,6 +418,46 @@ header {
 
 .redes i:hover {
   color: #22c55e;
+}
+
+/* ================= ESTILOS MEJORA FILTROS ================= */
+#btn-limpiar-filtros {
+  width: 100%;
+  margin-top: 10px;
+  background-color: #22c55e !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 15px !important;
+  border-radius: 20px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  transition: all 0.3s ease !important;
+}
+
+#btn-limpiar-filtros:hover {
+  background-color: #2d4709 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(63, 98, 18, 0.3) !important;
+}
+
+#precio-display {
+  font-weight: 600;
+  color: #3f6212;
+}
+
+#no-resultados {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 18px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ================= RESPONSIVE ================= */

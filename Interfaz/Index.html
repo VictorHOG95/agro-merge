@@ -5,8 +5,10 @@
     <title>Agro-Merger | Inicio</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
+    <link rel="icon" type="image/png" href="eCommerceAssets/img/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="eCommerceAssets/styles/eCommerceStyle.css.css" rel="stylesheet" type="text/css">
+    <link href="eCommerceAssets/styles/eCommerceStyle.css" rel="stylesheet" type="text/css">
+    <link href="eCommerceAssets/css/carrito.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -26,6 +28,11 @@
         </div>
             
         <input type="search" placeholder="Buscar un producto..." class="search-input">
+        
+        <button id="btn-carrito" class="btn-carrito" title="Carrito">
+            <i class="fa-solid fa-shopping-cart"></i>
+            <span id="carrito-count" class="carrito-count">0</span>
+        </button>
         
         <a href="pages/Login/login.html" title="Login" id="btn-login"><i class="fa-regular fa-user"></i> Iniciar Sesión</a>
     </header>
@@ -239,59 +246,34 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 	
-<!-- ESTE SCRIPT ES PARA CAMBIAR DE ESTADO LOGIN A USUARIO CON NOMBRE -->
+<script src="eCommerceAssets/js/session-header.js" data-perfil-href="pages/Perfil-vendedor/vendedor-perfil-1.html"></script>
 
-<script>
-  window.addEventListener('DOMContentLoaded', function() {
-    // 1. Atrapamos el dato de la URL si venimos del servidor (solo pasa en el Index)
-    const parametrosUrl = new URLSearchParams(window.location.search);
-    if (parametrosUrl.get('login') === 'true') {
-      localStorage.setItem('sesionIniciada', 'true');
-      localStorage.setItem('nombreUsuario', parametrosUrl.get('nombre'));
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
 
-    // 2. Leemos la caja fuerte
-    const sesionIniciada = localStorage.getItem('sesionIniciada');
-    const nombreUsuario = localStorage.getItem('nombreUsuario');
-    const btnLogin = document.getElementById('btn-login');
-
-    // 3. Si hay sesión y el botón existe en esta página...
-    if (sesionIniciada === 'true' && btnLogin) {
-      
-      // Transformamos el botón en un menú desplegable usando HTML y estilos en línea
-      btnLogin.outerHTML = `
-        <div style="position: relative; display: inline-block;">
-          <button id="btn-user-menu" style="background: none; border: none; cursor: pointer; font: inherit; color: inherit; display: flex; align-items: center; gap: 5px; padding: 5px;">
-            <i class="fa-regular fa-user"></i> ${nombreUsuario} <span style="font-size: 0.7em;">▼</span>
-          </button>
-          
-          <div id="dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; background-color: white; min-width: 160px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 5px; overflow: hidden; z-index: 1000; text-align: left;">
-            <a href="pages/Perfil/perfil.html" style="padding: 12px 16px; text-decoration: none; color: black; display: block; border-bottom: 1px solid #eee;">Mi Perfil</a>
-            <a href="#" style="padding: 12px 16px; text-decoration: none; color: black; display: block; border-bottom: 1px solid #eee;">Configuración</a>
-            <a href="#" id="btn-logout" style="padding: 12px 16px; text-decoration: none; color: #dc2626; display: block; font-weight: bold;">Cerrar Sesión</a>
-          </div>
+<!-- PANEL DEL CARRITO -->
+<div id="carrito-panel" class="carrito-panel">
+    <div class="carrito-header">
+        <h2>Carrito</h2>
+        <button id="btn-cerrar-carrito" class="btn-cerrar-carrito">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <div id="carrito-items" class="carrito-items">
+        <div class="carrito-vacio">
+            <i class="fa-solid fa-shopping-cart"></i>
+            <p>Tu carrito está vacío</p>
         </div>
-      `;
+    </div>
+    <div id="carrito-resumen" class="carrito-resumen" style="display: none;">
+        <div class="resumen-fila"><span>Subtotal</span><span id="subtotal">COP$ 0</span></div>
+        <div class="resumen-fila"><span>Envío</span><span id="envio">COP$ 7.900</span></div>
+        <div class="resumen-total"><span>Total</span><span id="total">COP$ 0</span></div>
+        <button id="btn-finalizar" class="btn-finalizar">Finalizar la compra</button>
+        <button id="btn-continuar" class="btn-continuar">Continuar comprando</button>
+    </div>
+</div>
+<div id="carrito-overlay" class="carrito-overlay"></div>
 
-      // Hacemos que al dar clic en el nombre, aparezca/desaparezca el menú
-      document.getElementById('btn-user-menu').addEventListener('click', function() {
-        const menu = document.getElementById('dropdown-menu');
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-      });
-
-      // Le damos vida al botón de "Cerrar Sesión"
-      document.getElementById('btn-logout').addEventListener('click', function(e) {
-        e.preventDefault(); // Evita que intente ir a otra página
-        // Borramos los datos de la caja fuerte
-        localStorage.removeItem('sesionIniciada');
-        localStorage.removeItem('nombreUsuario');
-        // Recargamos la página (al recargar, volverá a decir "Iniciar Sesión")
-        window.location.reload(); 
-      });
-    }
-  });
-</script>
-
+<script src="eCommerceAssets/js/session-header.js" data-perfil-href="pages/Perfil-vendedor/vendedor-perfil-1.html"></script>
+<script src="eCommerceAssets/js/carrito.js"></script>
 </body>
 </html>

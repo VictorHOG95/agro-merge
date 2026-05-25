@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Completa tu perfil - Paso 1</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="styles.css" />
+
 	<link href="../../eCommerceAssets/styles/styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -120,8 +120,22 @@
   </div>
 
   <script>
+    const sellerName = (localStorage.getItem('nombreUsuario') || 'vendedor').trim();
+    const productsStorageKey = `productos_vendedor_${sellerName.toLowerCase()}`;
     let products = [];
     let productIdCounter = 0;
+
+    function loadSellerProducts() {
+      const savedProducts = localStorage.getItem(productsStorageKey);
+      products = savedProducts ? JSON.parse(savedProducts) : [];
+      productIdCounter = products.length
+        ? Math.max(...products.map((p) => p.id || 0)) + 1
+        : 0;
+    }
+
+    function persistSellerProducts() {
+      localStorage.setItem(productsStorageKey, JSON.stringify(products));
+    }
 
     // Escuchar cambios en el input de archivo
     document.addEventListener('DOMContentLoaded', function() {
@@ -212,6 +226,7 @@
           };
 
           products.push(product);
+          persistSellerProducts();
           renderProducts();
           closeModal();
         };
@@ -224,6 +239,7 @@
     function deleteProduct(id) {
       if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
         products = products.filter(p => p.id !== id);
+        persistSellerProducts();
         renderProducts();
       }
     }
@@ -262,15 +278,17 @@
 
     function goToStep2() {
       if (products.length > 0) {
-        // Guardar productos en sessionStorage para acceder desde la siguiente página
+        // Guardar por compatibilidad en sessionStorage para otras vistas
         sessionStorage.setItem('products', JSON.stringify(products));
-        window.location.href = 'vendedor-perfil-2.html';
+        persistSellerProducts();
+        window.location.href = '/pages/Perfil-vendedor/vendedor-dashboard.html';
       } else {
         alert('Por favor agrega al menos un producto');
       }
     }
 
     // Inicializar la vista de productos
+    loadSellerProducts();
     renderProducts();
   </script>
 </body>

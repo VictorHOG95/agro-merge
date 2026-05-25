@@ -1,4 +1,3 @@
-Create database agro_merge_db;
 Use agro_merge_db;
 
 -- ================================================================

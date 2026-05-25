@@ -1,4 +1,4 @@
-@charset "utf-8";
+﻿@charset "utf-8";
 
 /* ================= RESET Y GLOBALES ================= */
 
@@ -146,7 +146,6 @@ header {
 #headerLinks a:hover { color: var(--primary); transform: translateY(-2px); }
 
 
-/* ================= SECCIÓN DE CONTACTO  ================= */
 
 .contact-section {
     width: 100%;
@@ -157,7 +156,7 @@ header {
 .contact-container {
     width: 1320px;
     max-width: 100%;
-    height: 665px; /* Altura fija solicitada */
+    height: 665px;
     background-color: #ffffff;
     opacity: 1;
     border: 1px solid #e0e0e0;
@@ -172,7 +171,6 @@ header {
     box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
 
-/* Título Contacto */
 .contact-title {
     text-align: center;
     font-size: 32px;
@@ -181,7 +179,6 @@ header {
     margin-bottom: 10px;
 }
 
-/* Iconos e Info */
 .contact-info {
     display: flex;
     justify-content: space-between;
@@ -225,7 +222,6 @@ header {
     text-decoration: underline;
 }
 
-/* Formulario */
 .contact-form {
     display: flex;
     flex-direction: column;

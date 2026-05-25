@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Vendedor | Agro-Merge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="../../eCommerceAssets/styles/eCommerceStyle.css" rel="stylesheet" type="text/css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* ================= HEADER ================= */
+        header.vendor-topbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .vendor-topbar__inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .vendor-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .vendor-nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .vendor-nav a:hover {
+            color: #3f6212;
+        }
+
+        .vendor-user-menu {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .vendor-user-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 4px 6px 8px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font: inherit;
+            color: #1f2937;
+            max-width: min(320px, 52vw);
+        }
+
+        .vendor-user-trigger:hover {
+            opacity: 0.85;
+        }
+
+        .vendor-user-trigger .vendor-user-icon {
+            font-size: 18px;
+            color: #374151;
+            flex-shrink: 0;
+        }
+
+        .vendor-user-name {
+            font-size: 15px;
+            font-weight: 400;
+            color: #111827;
+            text-transform: lowercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+        }
+
+        .vendor-user-caret {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #111827;
+            flex-shrink: 0;
+            margin-left: 2px;
+            opacity: 0.9;
+            transition: transform 0.2s ease;
+        }
+
+        .vendor-user-trigger[aria-expanded="true"] .vendor-user-caret {
+            transform: rotate(180deg);
+        }
+
+        .vendor-user-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 200px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            z-index: 2000;
+        }
+
+        .vendor-user-dropdown.is-open {
+            display: block;
+        }
+
+        .vendor-user-dropdown a,
+        .vendor-user-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 14px;
+            color: #374151;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .vendor-user-dropdown a:hover,
+        .vendor-user-dropdown button:hover {
+            background: #f9fafb;
+        }
+
+        .vendor-user-dropdown .vendor-dd-logout {
+            color: #dc2626;
+            font-weight: 600;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        /* Barra de filtros (alineada al estilo Productos) */
+        .vendor-filters-wrap {
+            margin-bottom: 20px;
+        }
+
+        .vendor-filters-wrap h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #3f6212;
+            margin-bottom: 12px;
+        }
+
+        .vendor-filters-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 14px 20px;
+            padding: 16px 18px;
+            background: #f8fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .vendor-filters-bar .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .vendor-filters-bar .filter-field label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .vendor-filters-bar .filter-field input[type="text"],
+        .vendor-filters-bar .filter-field input[type="number"] {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            min-width: 160px;
+        }
+
+        .vendor-filters-bar .filter-field input:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        }
+
+        .vendor-filters-bar .filter-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .vendor-filters-bar .btn-limpiar-filtros-vendor {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            background: #3f6212;
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .vendor-filters-bar .btn-limpiar-filtros-vendor:hover {
+            background: #2d4709;
+        }
+
+        /* ================= CONTENEDOR PRINCIPAL ================= */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ================= GRID LAYOUT ================= */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* ================= NOTIFICACIONES ================= */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3f6212;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            font-size: 24px;
+        }
+
+        /* Notificaciones */
+        .notificaciones-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .notificacion {
+            background: #f8fafb;
+            border-left: 4px solid #3f6212;
+            padding: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notificacion:hover {
+            background: #f0f3e9;
+            transform: translateX(5px);
+        }
+
+        .notificacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .notificacion-nombre {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .notificacion-precio {
+            color: #3f6212;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .notificacion-detalles {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .notificacion-estado {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ================= PRODUCTOS ================= */
+        .productos-section {
+            grid-column: 1 / -1;
+        }
+
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .producto-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .producto-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border-color: #3f6212;
+        }
+
+        .producto-imagen {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #dcfce7, #d1fae5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3f6212;
+            font-size: 48px;
+        }
+
+        .producto-info {
+            padding: 16px;
+        }
+
+        .producto-nombre {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .producto-precio {
+            color: #3f6212;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .producto-cantidad {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .producto-acciones {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-editar {
+            background: #e0f2e0;
+            color: #3f6212;
+        }
+
+        .btn-editar:hover {
+            background: #3f6212;
+            color: white;
+        }
+
+        .btn-eliminar {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-eliminar:hover {
+            background: #991b1b;
+            color: white;
+        }
+
+        /* ================= INFORME SEMANA ================= */
+        .informe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .informe-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-top: 4px solid #3f6212;
+        }
+
+        .informe-icon {
+            width: 50px;
+            height: 50px;
+            background: #f0f3e9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3f6212;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .informe-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .informe-valor {
+            font-size: 28px;
+            font-weight: 700;
+            color: #3f6212;
+            margin-bottom: 8px;
+        }
+
+        .informe-cambio {
+            font-size: 13px;
+            color: #16a34a;
+        }
+
+        .informe-cambio.negativo {
+            color: #dc2626;
+        }
+
+        /* ================= BOTONES PRINCIPALES ================= */
+        .btn-principal {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-principal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .productos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .informe-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .vendor-topbar__inner {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .vendor-nav {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                gap: 14px;
+            }
+
+            .vendor-user-menu {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                padding-top: 8px;
+                border-top: 1px solid #f3f4f6;
+            }
+
+            .vendor-user-trigger {
+                max-width: 100%;
+            }
+
+            .dashboard-container {
+                padding: 20px 10px;
+            }
+
+            .productos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .informe-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 16px;
+            }
+        }
+
+        /* Scrollbar personalizado */
+        .notificaciones-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .notificaciones-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .notificaciones-list::-webkit-scrollbar-thumb {
+            background: #3f6212;
+            border-radius: 10px;
+        }
+
+        .notificaciones-list::-webkit-scrollbar-thumb:hover {
+            background: #2d4709;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="vendor-topbar">
+        <div class="vendor-topbar__inner">
+            <div class="logo">
+                <img src="../../eCommerceAssets/img/logo.png" alt="Agro-Merge" class="logo__img" />
+                <span class="logo__text">Agro-Merge</span>
+            </div>
+
+            <nav class="vendor-nav">
+                <a href="../../Index.html" title="Inicio">Inicio</a>
+                <a href="../Productos/Productos.html" title="Productos">Productos</a>
+                <a href="#" title="Noticias">Noticias</a>
+                <a href="../Contactos/Contactos.html" title="Contacto">Contacto</a>
+            </nav>
+
+            <div class="vendor-user-menu" aria-label="Menú de cuenta">
+                <button type="button" class="vendor-user-trigger" id="vendor-user-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="vendor-user-dropdown" title="Tu cuenta">
+                    <i class="fa-regular fa-user vendor-user-icon" aria-hidden="true"></i>
+                    <span id="userName" class="vendor-user-name">cargando...</span>
+                    <span class="vendor-user-caret" aria-hidden="true"></span>
+                </button>
+                <div class="vendor-user-dropdown" id="vendor-user-dropdown" role="menu">
+                    <a href="vendedor-dashboard.html" role="menuitem">Panel de Control</a>
+                    <button type="button" class="vendor-dd-logout" id="vendor-dd-logout" role="menuitem">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="dashboard-container">
+        
+        <!-- NOTIFICACIONES Y PRODUCTOS -->
+        <div class="dashboard-grid">
+            <!-- NOTIFICACIONES DE PEDIDOS -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i> Nuevos Pedidos
+                </h2>
+                <div class="notificaciones-list" id="notificacionesList">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- PRODUCTOS -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-box"></i> Tus Productos
+                </h2>
+                <div class="vendor-filters-wrap" id="vendorFiltersWrap">
+                    <h3>Filtros</h3>
+                    <div class="vendor-filters-bar">
+                        <div class="filter-field">
+                            <label for="buscar-producto-vendor">Buscar producto</label>
+                            <input type="text" id="buscar-producto-vendor" placeholder="Ej: Maíz, Papa..." autocomplete="off">
+                        </div>
+                        <div class="filter-field">
+                            <label for="precio-min-vendor">Precio desde (COP)</label>
+                            <input type="number" id="precio-min-vendor" placeholder="0" min="0" value="0">
+                        </div>
+                        <div class="filter-field">
+                            <label for="precio-max-vendor">Precio hasta (COP)</label>
+                            <input type="number" id="precio-max-vendor" placeholder="Sin límite" min="0">
+                        </div>
+                        <div class="filter-actions">
+                            <button type="button" class="btn-limpiar-filtros-vendor" id="btn-limpiar-filtros-vendor">Limpiar filtros</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="productos-grid" id="productosGrid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+                <button class="btn-principal" onclick="agregarProducto()">
+                    <i class="fas fa-plus"></i> Agregar Producto
+                </button>
+            </div>
+        </div>
+
+        <!-- INFORME DE LA SEMANA -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-line"></i> Informe de la Semana
+            </h2>
+            <div class="informe-grid" id="informeGrid">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sellerProducts = [];
+        let sellerName = 'Vendedor';
+        let productsStorageKey = '';
+        let filtrosVendedorListo = false;
+
+        function decodeStoredName(raw) {
+            if (!raw) return 'Vendedor';
+            const s = String(raw).trim();
+            try {
+                return decodeURIComponent(s.replace(/\+/g, ' '));
+            } catch {
+                return s;
+            }
+        }
+
+        function getSellerProducts() {
+            const raw = localStorage.getItem(productsStorageKey);
+            return raw ? JSON.parse(raw) : [];
+        }
+
+        function saveSellerProducts() {
+            localStorage.setItem(productsStorageKey, JSON.stringify(sellerProducts));
+        }
+
+        // ================= FUNCIONES =================
+        function syncSessionFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('login') === 'true') {
+                const email = params.get('email');
+                const nombre = params.get('nombre');
+                const rol = params.get('rol');
+                if (email) localStorage.setItem('usuarioEmail', decodeStoredName(email));
+                if (nombre) {
+                    const dNombre = decodeStoredName(nombre);
+                    localStorage.setItem('nombreUsuario', dNombre);
+                    localStorage.setItem('usuarioNombre', dNombre);
+                }
+                if (rol) localStorage.setItem('usuarioRol', decodeStoredName(rol));
+                localStorage.setItem('sesionIniciada', 'true');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function inicializarDashboard() {
+            syncSessionFromUrl();
+            const rawName = (localStorage.getItem('nombreUsuario') || 'vendedor').trim();
+            productsStorageKey = `productos_vendedor_${rawName.toLowerCase()}`;
+            sellerName = decodeStoredName(rawName);
+            document.getElementById('userName').textContent = sellerName;
+
+            sellerProducts = getSellerProducts();
+
+            cargarNotificaciones();
+            cargarProductos();
+            cargarInforme();
+        }
+
+        function cargarNotificaciones() {
+            const container = document.getElementById('notificacionesList');
+            container.innerHTML = `
+                <div class="notificacion">
+                    <div class="notificacion-header">
+                        <span class="notificacion-nombre">🛎️ Sin pedidos nuevos</span>
+                    </div>
+                    <div class="notificacion-detalles">
+                        Esta sección se actualizará cuando tus productos reciban pedidos.
+                    </div>
+                    <span class="notificacion-estado">En espera</span>
+                </div>
+            `;
+        }
+
+        function filtrarProductosVendedor(list) {
+            const q = (document.getElementById('buscar-producto-vendor')?.value || '').trim().toLowerCase();
+            const min = parseFloat(document.getElementById('precio-min-vendor')?.value || '0');
+            const minVal = Number.isFinite(min) ? min : 0;
+            const maxRaw = document.getElementById('precio-max-vendor')?.value;
+            const maxParsed = parseFloat(maxRaw);
+            const maxVal = maxRaw === '' || maxRaw === undefined || Number.isNaN(maxParsed)
+                ? Infinity
+                : maxParsed;
+
+            return list.filter((p) => {
+                const name = (p.name || '').toLowerCase();
+                if (q && !name.includes(q)) return false;
+                const price = Number(p.price || 0);
+                if (price < minVal) return false;
+                if (price > maxVal) return false;
+                return true;
+            });
+        }
+
+        function renderProductosGrid(products) {
+            const container = document.getElementById('productosGrid');
+
+            if (!products.length) {
+                const hayStock = sellerProducts.length > 0;
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: #666; padding: 20px;">
+                        ${hayStock
+                            ? 'No hay productos que coincidan con los filtros.'
+                            : 'Aún no has agregado productos.'}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = products.map(prod => `
+                <div class="producto-item">
+                    <div class="producto-imagen">
+                        ${prod.image ? `<img src="${prod.image}" alt="${prod.name}" style="width:100%;height:100%;object-fit:cover;">` : '🌱'}
+                    </div>
+                    <div class="producto-info">
+                        <div class="producto-nombre">${prod.name}</div>
+                        <div class="producto-precio">COP$ ${Number(prod.price || 0).toLocaleString('es-CO')}</div>
+                        <div class="producto-cantidad">Stock: ${prod.quantity || 0} ${prod.unit || ''}</div>
+                        <div class="producto-acciones">
+                            <button type="button" class="btn-icon btn-editar" onclick="editarProducto(${prod.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button type="button" class="btn-icon btn-eliminar" onclick="eliminarProducto(${prod.id})">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function aplicarFiltrosVendedor() {
+            renderProductosGrid(filtrarProductosVendedor(sellerProducts));
+        }
+
+        function editarProducto(id) {
+            // Guardar el ID del producto que se va a editar
+            localStorage.setItem('editing_product_id', id);
+            // Redirigir a la página de edición (perfil avanzado ya no se usa, pero tal vez quieras usar su formulario)
+            window.location.href = '/pages/Perfil-vendedor/vendedor-perfil-1.html?edit=true';
+        }
+
+        function configurarFiltrosVendedor() {
+            if (filtrosVendedorListo) return;
+            filtrosVendedorListo = true;
+
+            ['buscar-producto-vendor', 'precio-min-vendor', 'precio-max-vendor'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', aplicarFiltrosVendedor);
+            });
+
+            const btnLimpiar = document.getElementById('btn-limpiar-filtros-vendor');
+            if (btnLimpiar) {
+                btnLimpiar.addEventListener('click', () => {
+                    const buscar = document.getElementById('buscar-producto-vendor');
+                    const min = document.getElementById('precio-min-vendor');
+                    const max = document.getElementById('precio-max-vendor');
+                    if (buscar) buscar.value = '';
+                    if (min) min.value = '0';
+                    if (max) max.value = '';
+                    aplicarFiltrosVendedor();
+                });
+            }
+        }
+
+        function cargarProductos() {
+            const wrap = document.getElementById('vendorFiltersWrap');
+
+            if (!sellerProducts.length) {
+                if (wrap) wrap.style.display = 'none';
+                renderProductosGrid([]);
+                return;
+            }
+
+            if (wrap) wrap.style.display = '';
+            configurarFiltrosVendedor();
+            aplicarFiltrosVendedor();
+        }
+
+        function cargarInforme() {
+            const container = document.getElementById('informeGrid');
+            const totalProductos = sellerProducts.length;
+            const inventarioTotal = sellerProducts.reduce((acc, p) => acc + Number(p.quantity || 0), 0);
+            const valorInventario = sellerProducts.reduce(
+                (acc, p) => acc + (Number(p.price || 0) * Number(p.quantity || 0)),
+                0
+            );
+            const precioPromedio = totalProductos
+                ? (sellerProducts.reduce((acc, p) => acc + Number(p.price || 0), 0) / totalProductos)
+                : 0;
+
+            const informeData = [
+                {
+                    label: 'Productos Publicados',
+                    valor: `${totalProductos}`,
+                    cambio: 'Basado en tus publicaciones',
+                    icon: '📦'
+                },
+                {
+                    label: 'Inventario Total',
+                    valor: `${inventarioTotal}`,
+                    cambio: 'Suma de cantidades disponibles',
+                    icon: '🌾'
+                },
+                {
+                    label: 'Valor de Inventario',
+                    valor: `COP$ ${valorInventario.toLocaleString('es-CO')}`,
+                    cambio: 'Precio x cantidad de tus productos',
+                    icon: '💰'
+                },
+                {
+                    label: 'Precio Promedio',
+                    valor: `COP$ ${Math.round(precioPromedio).toLocaleString('es-CO')}`,
+                    cambio: 'Promedio de precios publicados',
+                    icon: '📊'
+                }
+            ];
+
+            container.innerHTML = informeData.map(item => `
+                <div class="informe-card">
+                    <div class="informe-icon">${item.icon}</div>
+                    <div class="informe-label">${item.label}</div>
+                    <div class="informe-valor">${item.valor}</div>
+                    <div class="informe-cambio">
+                        ${item.cambio}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function agregarProducto() {
+            window.location.href = '/pages/Perfil-vendedor/vendedor-perfil-1.html';
+        }
+
+        function eliminarProducto(id) {
+            const producto = sellerProducts.find(p => p.id === id);
+            if (!producto) {
+                return;
+            }
+
+            if (confirm(`¿Eliminar ${producto.name}?`)) {
+                sellerProducts = sellerProducts.filter(p => p.id !== id);
+                saveSellerProducts();
+                cargarProductos();
+                cargarInforme();
+            }
+        }
+
+        function cerrarSesion() {
+            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                localStorage.clear();
+                window.location.href = '../Login/login.html';
+            }
+        }
+
+        function setUsuarioDropdownAbierto(abierto) {
+            const trigger = document.getElementById('vendor-user-trigger');
+            const dd = document.getElementById('vendor-user-dropdown');
+            if (!trigger || !dd) return;
+            trigger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+            dd.classList.toggle('is-open', abierto);
+        }
+
+        function inicializarMenuUsuario() {
+            const trigger = document.getElementById('vendor-user-trigger');
+            const dd = document.getElementById('vendor-user-dropdown');
+            const logout = document.getElementById('vendor-dd-logout');
+            if (!trigger || !dd) return;
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const abierto = trigger.getAttribute('aria-expanded') === 'true';
+                setUsuarioDropdownAbierto(!abierto);
+            });
+
+            document.addEventListener('click', () => setUsuarioDropdownAbierto(false));
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') setUsuarioDropdownAbierto(false);
+            });
+
+            if (logout) {
+                logout.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setUsuarioDropdownAbierto(false);
+                    cerrarSesion();
+                });
+            }
+
+            dd.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            inicializarDashboard();
+            inicializarMenuUsuario();
+        });
+    </script>
+</body>
+</html>
