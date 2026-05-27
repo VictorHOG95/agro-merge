@@ -198,7 +198,7 @@
                 }
 
                 const idPedidoNuevo = resP.insertId;
-                console.log(`✅ Pedido ${idPedidoNuevo} creado para id_comprador: ${idRealDelUsuario}`);
+                // console.log(`✅ Pedido ${idPedidoNuevo} creado para id_comprador: ${idRealDelUsuario}`);
 
                 // 3. Respuesta de éxito
                 // return res.json({
@@ -207,32 +207,161 @@
                 //     pedidoId: idPedidoNuevo
                 // });
 
-                // ===================================
-                // Crear pago usando PaymentService
-                // ===================================
+
+                // ===============================================
+                // Registrar pago pendiente en la base de datos
+                // ===============================================
                 //
-                // El checkout NO conoce el proveedor.
-                // Solo utiliza el servicio desacoplado.
-                // ===================================
-                const payment = await paymentService.createPayment({
-                    pedidoId: idPedidoNuevo,
-                    total,
-                    items
-                });
-                
-                // ===================================
-                // Respuesta final al frontend
-                // ===================================
-                return res.json({
-                    success: true,
-                    pedidoId: idPedidoNuevo,
-                    // URL de pago generada
-                    paymentUrl: payment.paymentUrl
-                });
+                // El pago inicialmente se crea como:
+                // estado_pago = pendiente
+                //
+                // Luego Mercado Pago actualizará este estado.
+                // ===============================================
+                const sqlPago = `
+                    INSERT INTO pagos (
+                        id_pedido,
+                        metodo_pago,
+                        estado_pago,
+                        monto,
+                        fecha_pago,
+                        proveedor_pago
+                    )
+                    VALUES (?, ?, 'pendiente', ?, NOW(), ?)
+                `;
+
+                // Método de pago temporal
+                const metodoPago = 'mercado_pago';
+
+                // Proveedor de pago
+                const proveedorPago = 'mercado_pago';
+
+                // Guardar pago
+                conexion.query(
+                    sqlPago,
+                    [
+                        idPedidoNuevo,
+                        metodoPago,
+                        total,
+                        proveedorPago
+                    ],
+                    async (errPago, resPago) => {
+
+                        // Error guardando pago
+                        if (errPago) {
+
+                            console.error(
+                                '❌ Error creando pago:',
+                                errPago.sqlMessage
+                            );
+
+                            return res.status(500).json({
+                                success: false,
+                                error: errPago.sqlMessage
+                            });
+                        }
+
+                        console.log(
+                            `✅ Pago registrado para pedido ${idPedidoNuevo}`
+                        );
+
+                        // =======================================
+                        // Crear pago usando PaymentService
+                        // =======================================
+                        const payment =
+                            await paymentService.createPayment({
+
+                                pedidoId: idPedidoNuevo,
+                                total,
+                                items
+
+                            });
+
+                        // =======================================
+                        // Respuesta final al frontend
+                        // =======================================
+                        return res.json({
+
+                            success: true,
+                            pedidoId: idPedidoNuevo,
+                            // URL de pago generada
+                            paymentUrl: payment.paymentUrl
+
+                        });
+
+                    }
+                );
 
             });
         });
     });
+
+    // ===============================================
+    // Simulación de confirmación de pago exitoso
+    // ===============================================
+    //
+    // Este endpoint simula la confirmación que
+    // posteriormente enviará Mercado Pago.
+    //
+    // Temporalmente se usará para actualizar:
+    // - pagos
+    // - pedidos
+    // ===============================================
+    app.get('/pago-exitoso/:pedidoId', (req, res) => {
+
+        const pedidoId = req.params.pedidoId;
+
+        // ===========================================
+        // Actualizar tabla pagos
+        // ===========================================
+        const sqlPago = `
+            UPDATE pagos
+            SET estado_pago = 'pagado'
+            WHERE id_pedido = ?
+        `;
+
+        conexion.query(sqlPago, [pedidoId], (errPago) => {
+
+            if (errPago) {
+
+                return res.status(500).json({
+                    success: false,
+                    error: errPago.sqlMessage
+                });
+            }
+
+            // =======================================
+            // Actualizar tabla pedidos
+            // =======================================
+            const sqlPedido = `
+                UPDATE pedidos
+                SET estado = 'pagado'
+                WHERE id_pedido = ?
+            `;
+
+            conexion.query(sqlPedido, [pedidoId], (errPedido) => {
+
+                if (errPedido) {
+
+                    return res.status(500).json({
+                        success: false,
+                        error: errPedido.sqlMessage
+                    });
+                }
+
+                console.log(
+                    `✅ Pedido ${pedidoId} marcado como PAGADO`
+                );
+
+                res.json({
+                    success: true
+                });
+
+            });
+
+        });
+
+    });
+
     app.get('/mis-pedidos/:email', (req, res) => {
         const email = req.params.email;
 

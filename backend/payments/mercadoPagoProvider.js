@@ -32,8 +32,8 @@ async function createPayment(data) {
     return {
         success: true,
 
-        // URL temporal de prueba
-        paymentUrl: 'https://google.com',
+        // URL 
+        paymentUrl: `http://localhost:3000/pago-exitoso/${data.pedidoId}`,
 
         // Referencia externa simulada
         externalReference: 'TEST-123'
