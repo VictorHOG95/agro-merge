@@ -4,6 +4,11 @@
     const path = require('path');
     const nodemailer = require('nodemailer');
 
+    // ===============================================
+    // Importación del servicio desacoplado de pagos
+    // ===============================================
+    const paymentService = require('./payments/paymentService');
+
     const app = express();
 
     // Configuración de Nodemailer
@@ -25,7 +30,7 @@
         host: '127.0.0.1',
         port: 3306, // Usamos el puerto libre para evitar el "Shutdown"
         user: 'root',
-        password: '',
+        password: '1234',
         database: 'agro_merge_db'
     });
 
@@ -163,14 +168,14 @@
     });
 
     // --- RUTA: CHECKOUT (Lógica de Agro-Merge) ---
-    app.post('/checkout', (req, res) => {
+    app.post('/checkout', async (req, res) => {
         // Recibimos los datos del CURL
         const { usuarioEmail, total, items, direccion, ciudad, departamento } = req.body;
         const direccionCompleta = `${direccion}, ${ciudad}, ${departamento}`;
 
         // 1. Buscamos el ID del usuario en la tabla 'usuarios'
         // En tu captura de 'usuarios' la columna es 'id_usuario'
-        conexion.query('SELECT id_usuario FROM usuarios WHERE email = ?', [usuarioEmail], (err, users) => {
+        conexion.query('SELECT id_usuario FROM usuarios WHERE email = ?', [usuarioEmail], async (err, users) => {
             if (err) return res.status(500).json({ success: false, error: 'Error al buscar usuario' });
             
             if (users.length === 0) {
@@ -186,7 +191,7 @@
                 VALUES (?, 'pendiente', ?, ?, NOW())
             `;
 
-            conexion.query(sqlPedido, [idRealDelUsuario, total, direccionCompleta], (errP, resP) => {
+            conexion.query(sqlPedido, [idRealDelUsuario, total, direccionCompleta], async (errP, resP) => {
                 if (errP) {
                     console.error("❌ Error de MySQL:", errP.sqlMessage);
                     return res.status(500).json({ success: false, error: errP.sqlMessage });
@@ -196,11 +201,35 @@
                 console.log(`✅ Pedido ${idPedidoNuevo} creado para id_comprador: ${idRealDelUsuario}`);
 
                 // 3. Respuesta de éxito
+                // return res.json({
+                //     success: true,
+                //     message: '¡Compra procesada con éxito!',
+                //     pedidoId: idPedidoNuevo
+                // });
+
+                // ===================================
+                // Crear pago usando PaymentService
+                // ===================================
+                //
+                // El checkout NO conoce el proveedor.
+                // Solo utiliza el servicio desacoplado.
+                // ===================================
+                const payment = await paymentService.createPayment({
+                    pedidoId: idPedidoNuevo,
+                    total,
+                    items
+                });
+                
+                // ===================================
+                // Respuesta final al frontend
+                // ===================================
                 return res.json({
                     success: true,
-                    message: '¡Compra procesada con éxito!',
-                    pedidoId: idPedidoNuevo
+                    pedidoId: idPedidoNuevo,
+                    // URL de pago generada
+                    paymentUrl: payment.paymentUrl
                 });
+
             });
         });
     });

@@ -246,14 +246,55 @@
             })
             .then(response => response.json())
             .then(data => {
+                // if (data.success) {
+                //     document.getElementById('msg-exito').style.display = 'block';
+                //     document.getElementById('msg-error').style.display = 'none';
+                //     localStorage.removeItem('pedido_actual');
+                //     localStorage.removeItem('carrito');
+                //     setTimeout(() => {
+                //         window.location.href = '/pages/Productos/Productos.html';
+                //     }, 3000);
+
+                // ===============================================
+                // Validación de respuesta exitosa del backend
+                // ===============================================
+                //
+                // Si el backend creó correctamente:
+                // - el pedido
+                // - el registro de pago
+                // - la preferencia de Mercado Pago
+                //
+                // entonces se redirecciona al usuario hacia
+                // la pasarela de pago.
+                // ===============================================
                 if (data.success) {
-                    document.getElementById('msg-exito').style.display = 'block';
-                    document.getElementById('msg-error').style.display = 'none';
-                    localStorage.removeItem('pedido_actual');
-                    localStorage.removeItem('carrito');
-                    setTimeout(() => {
-                        window.location.href = '/pages/Productos/Productos.html';
-                    }, 3000);
+
+                // Ocultamos mensajes de error
+                document.getElementById('msg-error').style.display = 'none';
+
+                // ===========================================
+                // Limpiar carrito local
+                // ===========================================
+                //
+                // Se eliminan los datos temporales porque
+                // el pedido ya fue registrado en backend.
+                // ===========================================
+                localStorage.removeItem('pedido_actual');
+                localStorage.removeItem('carrito');
+
+                // ===========================================
+                // Redirección hacia la pasarela de pago
+                // ===========================================
+                //
+                // El frontend NO conoce:
+                // - Mercado Pago
+                // - Stripe
+                // - Wompi
+                //
+                // Solo recibe una URL de pago y redirecciona.
+                // ===========================================
+                window.location.href = data.paymentUrl;
+
                 } else {
                     document.getElementById('msg-error').innerHTML = `<strong>Error</strong> ${data.error || 'No se pudo procesar el pago.'}`;
                     document.getElementById('msg-error').style.display = 'block';
