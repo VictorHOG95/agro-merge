@@ -26,7 +26,7 @@ const {
 // ===============================================
 const client = new MercadoPagoConfig({
 
-    accessToken: ''
+    accessToken: 'APP_USR-3078148543034322-052714-340b6b90e1a2e14719a429459cae851b-3429822527'
 
 });
 

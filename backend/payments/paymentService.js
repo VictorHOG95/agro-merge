@@ -18,13 +18,13 @@
 
 // Importamos el proveedor actual de pagos
 const mercadoPagoProvider = require('./mercadoPagoProvider');
-const fakeProvider = require('./providers/fakeProvider');
+// const fakeProvider = require('./providers/fakeProvider');
 
 
 // Definimos el proveedor activo.
 // Se cambia segun el proveedor
-const provider = fakeProvider;
-//const provider = mercadoPagoProvider;
+// const provider = fakeProvider;
+const provider = mercadoPagoProvider;
 
 // ===============================================
 // Función genérica para crear pagos
