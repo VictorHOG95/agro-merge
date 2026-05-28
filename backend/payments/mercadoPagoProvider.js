@@ -14,30 +14,126 @@
 // ===============================================
 
 // ===============================================
+// SDK oficial de Mercado Pago
+// ===============================================
+const {
+    MercadoPagoConfig,
+    Preference
+} = require('mercadopago');
+
+// ===============================================
+// Configuración cliente Mercado Pago
+// ===============================================
+const client = new MercadoPagoConfig({
+
+    accessToken: ''
+
+});
+
+
+// ===============================================
 // Función para crear un pago
 // ===============================================
 //
-// Actualmente es una simulación temporal.
-//
-// Más adelante aquí se integrará:
-// - SDK Mercado Pago
-// - creación de preferencias
-// - links de pago reales
+// Esta función:
+// 1. Recibe datos del checkout
+// 2. Crea una preferencia de Mercado Pago
+// 3. Devuelve la URL de pago
 // ===============================================
 async function createPayment(data) {
 
-    console.log('🟢 Creando pago con Mercado Pago');
+    try {
 
-    // Simulación temporal de respuesta
-    return {
-        success: true,
+        console.log(
+            '🟢 Creando preferencia Mercado Pago'
+        );
 
-        // URL 
-        paymentUrl: `http://localhost:3000/pago-exitoso/${data.pedidoId}`,
+        // =======================================
+        // Instancia Preference
+        // =======================================
+        const preference = new Preference(client);
 
-        // Referencia externa simulada
-        externalReference: 'TEST-123'
-    };
+        // =======================================
+        // Crear preferencia
+        // =======================================
+        console.log(
+            JSON.stringify({
+                items: data.items
+            }, null, 2)
+        );
+        const response = await preference.create({
+
+            body: {
+
+                items: data.items.map(item => ({
+
+                    title: item.nombre,
+
+                    quantity: Number(item.cantidad),
+
+                    unit_price: Number(item.precio),
+
+                    currency_id: 'COP'
+
+                })),
+
+                // ===================================
+                // URLs retorno
+                // ===================================
+                back_urls: {
+
+                    success:
+                        `http://localhost:3000/pago-exitoso/${data.pedidoId}`,
+
+                    failure:
+                        `http://localhost:3000/pago-fallido/${data.pedidoId}`,
+
+                    pending:
+                        `http://localhost:3000/pago-pendiente/${data.pedidoId}`
+
+                },
+
+                //Genera fallos
+                //auto_return: 'approved',
+
+                // ===================================
+                // Referencia interna
+                // ===================================
+                external_reference:
+                    String(data.pedidoId)
+
+            }
+
+
+        });
+
+        console.log(
+            '✅ Preferencia creada'
+        );
+
+        // =======================================
+        // Retorno normalizado
+        // =======================================
+        return {
+
+            success: true,
+
+            paymentUrl: response.sandbox_init_point,
+
+            reference: response.id
+
+        };
+
+    } catch (error) {
+
+        console.error(
+            '❌ Error Mercado Pago:',
+            error
+        );
+
+        throw error;
+
+    }
 
 }
 

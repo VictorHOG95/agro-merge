@@ -267,14 +267,36 @@
                         // =======================================
                         // Crear pago usando PaymentService
                         // =======================================
-                        const payment =
-                            await paymentService.createPayment({
+                        let payment;
 
-                                pedidoId: idPedidoNuevo,
-                                total,
-                                items
+                        try {
+
+                            payment =
+                                await paymentService.createPayment({
+
+                                    pedidoId: idPedidoNuevo,
+                                    total,
+                                    items
+
+                                });
+
+                        } catch (paymentError) {
+
+                            console.error(
+                                '❌ Error creando pago:',
+                                paymentError
+                            );
+
+                            return res.status(500).json({
+
+                                success: false,
+
+                                error:
+                                    'No fue posible crear el pago con Mercado Pago'
 
                             });
+
+                        }
 
                         // =======================================
                         // Respuesta final al frontend
@@ -308,7 +330,14 @@
     // ===============================================
     app.get('/pago-exitoso/:pedidoId', (req, res) => {
 
+        // =======================================
+        // Obtener ID pedido desde URL
+        // =======================================
         const pedidoId = req.params.pedidoId;
+
+        console.log(
+            `✅ Pago exitoso para pedido ${pedidoId}`
+        );
 
         // ===========================================
         // Actualizar tabla pagos
@@ -342,9 +371,19 @@
 
                 if (errPedido) {
 
-                    return res.status(500).json({
+                    // Error actualizando pedido
+                    // return res.status(500).json({
+                    //     success: false,
+                    //     error: errPedido.sqlMessage
+                    // });
+                    console.error(
+                        '❌ Error pedido:',
+                        errPedido
+                    );
+
+                    return res.json({
                         success: false,
-                        error: errPedido.sqlMessage
+                        error: 'Error actualizando pedido'
                     });
                 }
 
@@ -357,6 +396,76 @@
                 });
 
             });
+
+        });
+
+    });
+
+    // ===============================================
+    // Pago rechazado
+    // ===============================================
+    app.get('/pago-fallido/:pedidoId', (req, res) => {
+
+        const pedidoId = req.params.pedidoId;
+
+        const sqlPago = `
+            UPDATE pagos
+            SET estado_pago = 'rechazado'
+            WHERE id_pedido = ?
+        `;
+
+        conexion.query(sqlPago, [pedidoId], (err) => {
+
+            if (err) {
+
+                return res.status(500).json({
+                    success: false,
+                    error: err.sqlMessage
+                });
+
+            }
+
+            res.send(`
+                <h1>❌ Pago rechazado</h1>
+                <a href="/pages/Productos/Productos.html">
+                    Volver a tienda
+                </a>
+            `);
+
+        });
+
+    });
+
+    // ===============================================
+    // Pago pendiente
+    // ===============================================
+    app.get('/pago-pendiente/:pedidoId', (req, res) => {
+
+        const pedidoId = req.params.pedidoId;
+
+        const sqlPago = `
+            UPDATE pagos
+            SET estado_pago = 'pendiente'
+            WHERE id_pedido = ?
+        `;
+
+        conexion.query(sqlPago, [pedidoId], (err) => {
+
+            if (err) {
+
+                return res.status(500).json({
+                    success: false,
+                    error: err.sqlMessage
+                });
+
+            }
+
+            res.send(`
+                <h1>⏳ Pago pendiente</h1>
+                <a href="/pages/Productos/Productos.html">
+                    Volver a tienda
+                </a>
+            `);
 
         });
 
